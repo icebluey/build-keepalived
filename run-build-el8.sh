@@ -18,7 +18,7 @@ docker exec al8 yum makecache
 #docker exec al8 /bin/rm -f /tmp/.runme.sh
 docker exec al8 /bin/bash -c 'rm -fr /tmp/*'
 docker cp el8 al8:/home/
-docker exec al8 /bin/bash /home/el8/build-keepalived-quictls.sh
+docker exec al8 /bin/bash /home/el8/build-keepalived.sh
 _keepalived_ver="$(docker exec al8 ls -1 /tmp/ | grep -i '^keepalived.*xz$' | sed -e 's|keepalived-||g' -e 's|-[0-1]\.el.*||g')"
 rm -fr /home/.tmp.keepalived
 mkdir /home/.tmp.keepalived

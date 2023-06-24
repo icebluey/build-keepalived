@@ -17,7 +17,7 @@ docker exec c7 /bin/bash /tmp/.runme.sh
 docker exec c7 /bin/rm -f /tmp/.runme.sh
 docker exec c7 /bin/bash -c '/bin/rm -fr /tmp/*'
 docker cp el7 c7:/home/
-docker exec c7 /bin/bash /home/el7/build-keepalived-quictls.sh
+docker exec c7 /bin/bash /home/el7/build-keepalived.sh
 _keepalived_ver="$(docker exec c7 ls -1 /tmp/ | grep -i '^keepalived.*xz$' | sed -e 's|keepalived-||g' -e 's|-[0-1]\.el.*||g')"
 rm -fr /home/.tmp.keepalived
 mkdir /home/.tmp.keepalived
