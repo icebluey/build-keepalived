@@ -73,7 +73,7 @@ _build_zlib() {
     rm -f zlib-*.tar*
     cd zlib-*
     ./configure --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --sysconfdir=/etc --64
-    make all
+    make -j2 all
     rm -fr /tmp/zlib
     make DESTDIR=/tmp/zlib install
     cd /tmp/zlib
@@ -120,7 +120,7 @@ _build_openssl111() {
     no-sm2 no-sm3 no-sm4 \
     shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
     perl configdata.pm --dump
-    make all
+    make -j2 all
     rm -fr /tmp/openssl111
     make DESTDIR=/tmp/openssl111 install_sw
     cd /tmp/openssl111
@@ -173,7 +173,7 @@ _build_openssl30() {
     no-sm2 no-sm3 no-sm4 \
     shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
     perl configdata.pm --dump
-    make all
+    make -j2 all
     rm -fr /tmp/openssl30
     make DESTDIR=/tmp/openssl30 install_sw
     cd /tmp/openssl30
@@ -223,7 +223,7 @@ LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib64/keepalived/privat
 --enable-nftables \
 --disable-iptables \
 --with-init=systemd
-make all
+make -j2 all
 rm -fr /tmp/keepalived
 sleep 2
 make DESTDIR=/tmp/keepalived install
