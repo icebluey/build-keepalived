@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+TZ='UTC'; export TZ
+umask 022
+ln -svf ../usr/share/zoneinfo/UTC /etc/localtime
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata
+dpkg-reconfigure --frontend noninteractive tzdata
+snap remove --purge lxd
+snap remove --purge firefox
+snap remove --purge snap-store
+snap remove --purge core
+snap remove --purge core18
+snap remove --purge core20
+snap remove --purge snapd-desktop-integration
+systemctl stop docker.socket
+systemctl stop podman.socket
+systemctl stop docker.service
+systemctl stop containerd.service
+systemctl stop podman.service
+systemctl disable docker.socket
+systemctl disable podman.socket
+systemctl disable docker.service
+systemctl disable containerd.service
+systemctl disable podman.service
+systemctl stop snapd.service
+systemctl stop snapd.socket
+systemctl stop snapd.seeded.service
+systemctl disable snapd.service
+systemctl disable snapd.socket
+systemctl disable snapd.seeded.service
+apt autoremove --purge -y snapd
+apt autoremove --purge -y firefox
+apt autoremove --purge -y moby-engine
+apt autoremove --purge -y moby-cli
+apt autoremove --purge -y moby-buildx
+apt autoremove --purge -y moby-compose
+apt autoremove --purge -y moby-containerd
+apt autoremove --purge -y moby-runc
+apt autoremove --purge -y podman
+apt autoremove --purge -y crun
+rm -fr ~/snap
+rm -fr /snap
+rm -fr /var/snap
+rm -fr /var/lib/snapd
+rm -fr /var/cache/snapd
+rm -fr /tmp/snap.lxd
+rm -fr /etc/apt/preferences.d/firefox*
+systemctl stop systemd-resolved.service
+systemctl stop systemd-timesyncd
+systemctl stop unattended-upgrades
+systemctl stop udisks2.service
+systemctl disable systemd-resolved.service
+systemctl disable systemd-timesyncd
+systemctl disable unattended-upgrades
+systemctl disable udisks2.service
+rm -fr /etc/resolv.conf
+echo "nameserver 8.8.8.8" >/etc/resolv.conf 
+apt install -y chrony
+systemctl stop chrony.service
+sed -e "/^pool/d" -i /etc/chrony/chrony.conf
+sed -e "/^server/d" -i /etc/chrony/chrony.conf
+sed -e "s|^refclock|#refclock|g" -i /etc/chrony/chrony.conf
+sed -e "1iserver time1.google.com iburst minpoll 4 maxpoll 5\nserver time2.google.com iburst minpoll 4 maxpoll 5\nserver time3.google.com iburst minpoll 4 maxpoll 5\nserver time4.google.com iburst minpoll 4 maxpoll 5" -i /etc/chrony/chrony.conf
+systemctl enable chrony.service
+systemctl start chrony.service
+chronyc makestep
+apt install -y binutils coreutils util-linux findutils diffutils pkg-config
+apt install -y systemd passwd patch sed gawk grep file tar gzip bzip2 xz-utils
+apt install -y socat ethtool ipvsadm ipset psmisc bash-completion conntrack iproute2 nfs-common
+apt install -y daemon procps net-tools
+apt install -y iptables
+apt install -y ebtables
+apt install -y nftables
