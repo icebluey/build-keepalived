@@ -7,11 +7,11 @@ global_defs {
 }
 vrrp_script check_haproxy {
     script "/bin/bash -c 'if [[ $(ps -C haproxy --no-header | wc -l) -eq 0 ]] ; then exit 1;fi'"
-    interval 5
+    interval 3
     weight -30
-    fall 3
+    fall 2
     rise 5
-    timeout 5
+    timeout 3
 }
 vrrp_instance vi1 {
     state MASTER
@@ -48,11 +48,11 @@ global_defs {
 }
 vrrp_script check_haproxy {
     script "/bin/bash -c 'if [[ $(ps -C haproxy --no-header | wc -l) -eq 0 ]] ; then exit 1;fi'"
-    interval 5
+    interval 3
     weight -30
-    fall 3
+    fall 2
     rise 5
-    timeout 5
+    timeout 3
 }
 vrrp_instance vi1 {
     state BACKUP
