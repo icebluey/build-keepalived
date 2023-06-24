@@ -9,7 +9,7 @@ docker run --cpus="2.0" --rm --name ub2004 -itd ubuntu:20.04 bash
 sleep 2
 docker exec ub2004 apt update -y
 docker exec ub2004 apt upgrade -fy
-docker exec ub2004 apt install -y bash vim wget ca-certificates
+docker exec ub2004 apt install -y bash vim wget ca-certificates curl
 docker exec ub2004 /bin/ln -svf bash /bin/sh
 docker exec ub2004 /bin/rm -fr /tmp/.setup_env_ub2004
 docker exec ub2004 wget -q "https://raw.githubusercontent.com/icebluey/build/master/.setup_env_ub2004" -O "/tmp/.setup_env_ub2004"
