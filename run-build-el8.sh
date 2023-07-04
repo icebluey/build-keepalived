@@ -9,13 +9,6 @@ docker run --cpus="2.0" --hostname 'x86-034.build.eng.bos.redhat.com' --rm --nam
 sleep 2
 docker exec al8 yum clean all
 docker exec al8 yum makecache
-#docker exec al8 yum install -y bash vim wget ca-certificates
-#docker exec al8 /bin/ln -svf bash /bin/sh
-#docker exec al8 /bin/rm -fr /tmp/.runme.sh
-#docker exec al8 /bin/rm -fr /tmp/yum.log
-#docker exec al8 wget -q "https://raw.githubusercontent.com/icebluey/pre-build/master/el8/.preinstall-el8" -O /tmp/.runme.sh
-#docker exec al8 /bin/bash /tmp/.runme.sh
-#docker exec al8 /bin/rm -f /tmp/.runme.sh
 docker exec al8 /bin/bash -c 'rm -fr /tmp/*'
 docker cp el8 al8:/home/
 docker exec al8 /bin/bash /home/el8/build-keepalived.sh
