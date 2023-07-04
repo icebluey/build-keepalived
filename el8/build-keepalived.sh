@@ -4,6 +4,22 @@ TZ='UTC'; export TZ
 
 umask 022
 
+_install_kernel_dev() {
+    _tmp_dir="$(mktemp -d)"
+    cd "${_tmp_dir}"
+    _kver="6.1.37-20230704"
+    wget -c -t 9 -T 9 "https://github.com/icebluey/kernel.el8/releases/download/v${_kver}/kernel-headers-${_kver}.el8.x86_64.rpm"
+    wget -c -t 9 -T 9 "https://github.com/icebluey/kernel.el8/releases/download/v${_kver}/kernel-devel-${_kver}.el8.x86_64.rpm"
+    yum localinstall -y kernel-headers-*.rpm
+    yum localinstall -y kernel-devel-*.rpm
+    sleep 2
+    cd /tmp
+    rm -fr "${_tmp_dir}"
+    exit
+}
+yum makecache
+_install_kernel_dev
+
 CFLAGS='-O2 -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection'
 export CFLAGS
 CXXFLAGS='-O2 -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection'
