@@ -15,9 +15,7 @@ _install_kernel_dev() {
     sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
-    exit
 }
-yum makecache
 _install_kernel_dev
 
 CFLAGS='-O2 -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection'
