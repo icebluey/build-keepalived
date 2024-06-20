@@ -141,12 +141,12 @@ _build_openssl111() {
     /sbin/ldconfig
 }
 
-_build_openssl30() {
+_build_openssl33() {
     set -e
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
-    _openssl30_ver="$(wget -qO- 'https://www.openssl.org/source/' | grep 'href="openssl-3\.0\.' | sed 's|"|\n|g' | grep -i '^openssl-3\.0\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
-    wget -c -t 9 -T 9 "https://www.openssl.org/source/openssl-${_openssl30_ver}.tar.gz"
+    _openssl33_ver="$(wget -qO- 'https://www.openssl.org/source/' | grep 'href="openssl-3\.3\.' | sed 's|"|\n|g' | grep -i '^openssl-3\.3\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
+    wget -c -t 9 -T 9 "https://www.openssl.org/source/openssl-${_openssl33_ver}.tar.gz"
     tar -xof openssl-*.tar*
     sleep 1
     rm -f openssl-*.tar*
@@ -170,9 +170,9 @@ _build_openssl30() {
     shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
     perl configdata.pm --dump
     make -j2 all
-    rm -fr /tmp/openssl30
-    make DESTDIR=/tmp/openssl30 install_sw
-    cd /tmp/openssl30
+    rm -fr /tmp/openssl33
+    make DESTDIR=/tmp/openssl33 install_sw
+    cd /tmp/openssl33
     # Only for debian/ubuntu
     mkdir -p usr/include/x86_64-linux-gnu/openssl
     chmod 0755 usr/include/x86_64-linux-gnu/openssl
@@ -190,14 +190,14 @@ _build_openssl30() {
     sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
-    rm -fr /tmp/openssl30
+    rm -fr /tmp/openssl33
     /sbin/ldconfig
 }
 
 rm -fr /usr/lib/x86_64-linux-gnu/keepalived
 _build_zlib
 #_build_openssl111
-_build_openssl30
+_build_openssl33
 
 _tmp_dir="$(mktemp -d)"
 cd "${_tmp_dir}"
@@ -208,7 +208,7 @@ tar -xof keepalived-*.tar*
 sleep 1
 rm -f keepalived-*.tar*
 cd keepalived-*
-LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib/x86_64-linux-gnu/keepalived/private' ; export LDFLAGS
+#LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib/x86_64-linux-gnu/keepalived/private' ; export LDFLAGS
 ./configure \
 --build=x86_64-linux-gnu \
 --host=x86_64-linux-gnu \
@@ -286,13 +286,16 @@ echo '\''/var/log/keepalived/*log {
 systemctl restart rsyslog.service >/dev/null 2>&1 || : 
 ' > etc/keepalived/.install.txt
 chmod 0644 etc/keepalived/.install.txt
+
+patchelf --add-rpath '$ORIGIN/../lib/x86_64-linux-gnu/keepalived/private' usr/sbin/keepalived
+rm -fr lib
 echo
 sleep 2
-tar -Jcvf /tmp/"keepalived-${_keepalived_ver}-1_amd64.tar.xz" *
+tar -Jcvf /tmp/"keepalived-${_keepalived_ver}-1_ub2004_amd64.tar.xz" *
 echo
 sleep 2
 cd /tmp
-sha256sum "keepalived-${_keepalived_ver}-1_amd64.tar.xz" > "keepalived-${_keepalived_ver}-1_amd64.tar.xz".sha256
+sha256sum "keepalived-${_keepalived_ver}-1_ub2004_amd64.tar.xz" > "keepalived-${_keepalived_ver}-1_ub2004_amd64.tar.xz".sha256
 cd /tmp
 rm -fr /tmp/keepalived
 rm -fr "${_tmp_dir}"
