@@ -13,9 +13,9 @@ set -e
 _tmp_dir="$(mktemp -d)"
 cd "${_tmp_dir}"
 wget -q -c -t 9 -T 9 \
-"https://github.com/icebluey/k8s/releases/download/v2023-06-20/containerd-1.7.2-1_amd64.tar.xz"
+"https://github.com/icebluey/k8s/releases/download/v2024-06-15/containerd-1.7.18-1_amd64.tar.xz"
 wget -q -c -t 9 -T 9 \
-"https://github.com/icebluey/k8s/releases/download/v2023-06-20/docker-only-23.0.6-1_amd64.tar.xz"
+"https://github.com/icebluey/k8s/releases/download/v2024-06-15/docker-only-26.1.4-1_amd64.tar.xz"
 rm -f /usr/bin/containerd
 rm -f /usr/bin/containerd-shim
 rm -f /usr/bin/containerd-shim-runc-v1
