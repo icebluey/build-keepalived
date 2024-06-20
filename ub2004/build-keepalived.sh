@@ -14,6 +14,8 @@ CXX=g++
 export CXX
 /sbin/ldconfig
 
+apt install -y patchelf
+
 set -e
 
 _strip_files() {
