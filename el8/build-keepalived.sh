@@ -159,12 +159,12 @@ _build_openssl111() {
     /sbin/ldconfig
 }
 
-_build_openssl30() {
+_build_openssl33() {
     set -e
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
-    _openssl30_ver="$(wget -qO- 'https://www.openssl.org/source/' | grep 'href="openssl-3\.0\.' | sed 's|"|\n|g' | grep -i '^openssl-3\.0\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
-    wget -c -t 9 -T 9 "https://www.openssl.org/source/openssl-${_openssl30_ver}.tar.gz"
+    _openssl33_ver="$(wget -qO- 'https://www.openssl.org/source/' | grep 'href="openssl-3\.3\.' | sed 's|"|\n|g' | grep -i '^openssl-3\.3\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
+    wget -c -t 9 -T 9 "https://www.openssl.org/source/openssl-${_openssl33_ver}.tar.gz"
     tar -xof openssl-*.tar*
     sleep 1
     rm -f openssl-*.tar*
@@ -188,9 +188,9 @@ _build_openssl30() {
     shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
     perl configdata.pm --dump
     make -j2 all
-    rm -fr /tmp/openssl30
-    make DESTDIR=/tmp/openssl30 install_sw
-    cd /tmp/openssl30
+    rm -fr /tmp/openssl33
+    make DESTDIR=/tmp/openssl33 install_sw
+    cd /tmp/openssl33
     # Only for debian/ubuntu
     #mkdir -p usr/include/x86_64-linux-gnu/openssl
     #chmod 0755 usr/include/x86_64-linux-gnu/openssl
@@ -208,14 +208,14 @@ _build_openssl30() {
     sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
-    rm -fr /tmp/openssl30
+    rm -fr /tmp/openssl33
     /sbin/ldconfig
 }
 
 rm -fr /usr/lib64/keepalived
 #_build_zlib
 #_build_openssl111
-#_build_openssl30
+_build_openssl33
 
 _tmp_dir="$(mktemp -d)"
 cd "${_tmp_dir}"
@@ -243,6 +243,8 @@ sleep 2
 make DESTDIR=/tmp/keepalived install
 cd /tmp/keepalived
 rm -fr usr/lib
+rm -fr lib
+rm -fr lib64
 install -m 0755 -d var/log/keepalived
 install -m 0755 -d usr/libexec/keepalived
 [[ -f etc/keepalived/keepalived.conf ]] && mv -f etc/keepalived/keepalived.conf etc/keepalived/keepalived.conf.default
