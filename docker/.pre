@@ -2,6 +2,9 @@
 export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 TZ='UTC'; export TZ
 umask 022
+
+# ubuntu 22.04
+
 ln -svf ../usr/share/zoneinfo/UTC /etc/localtime
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y tzdata
 dpkg-reconfigure --frontend noninteractive tzdata
