@@ -289,7 +289,8 @@ systemctl restart rsyslog.service >/dev/null 2>&1 || :
 ' > etc/keepalived/.install.txt
 chmod 0644 etc/keepalived/.install.txt
 
-patchelf --add-rpath '$ORIGIN/../lib/x86_64-linux-gnu/keepalived/private' usr/sbin/keepalived
+# ubuntu 20.04 patchelf 0.10
+patchelf --set-rpath '$ORIGIN/../lib/x86_64-linux-gnu/keepalived/private' usr/sbin/keepalived
 rm -fr lib
 echo
 sleep 2
