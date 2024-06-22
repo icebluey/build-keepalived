@@ -290,6 +290,7 @@ echo '\''/var/log/keepalived/*log {
     endscript
 }'\'' >/etc/logrotate.d/keepalived
 systemctl restart rsyslog.service >/dev/null 2>&1 || : 
+systemctl restart logrotate.service >/dev/null 2>&1 || : 
 ' > etc/keepalived/.install.txt
 chmod 0644 etc/keepalived/.install.txt
 
