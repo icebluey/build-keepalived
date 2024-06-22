@@ -272,13 +272,14 @@ install -v -c -m 0644 keepalived.service /lib/systemd/system/
 systemctl daemon-reload >/dev/null 2>&1 || : 
 [[ -d /var/log/keepalived ]] || install -m 0755 -d /var/log/keepalived
 [[ -f /var/log/keepalived/keepalived.log ]] || cat /dev/null > /var/log/keepalived/keepalived.log
+chown syslog:adm /var/log/keepalived/keepalived.log
 echo '\'':programname, startswith, "Keepalived" {
     /var/log/keepalived/keepalived.log
     stop
 }'\'' >/etc/rsyslog.d/10-keepalived.conf
 echo '\''/var/log/keepalived/*log {
     daily
-    rotate 62
+    rotate 30
     dateext
     missingok
     notifempty
