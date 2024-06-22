@@ -209,7 +209,8 @@ sleep 1
 rm -f keepalived-*.tar*
 cd keepalived-*
 LDFLAGS=''
-#LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib/x86_64-linux-gnu/keepalived/private' ; export LDFLAGS
+LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
+#LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib/x86_64-linux-gnu/keepalived/private'; export LDFLAGS
 ./configure \
 --build=x86_64-linux-gnu \
 --host=x86_64-linux-gnu \
