@@ -269,6 +269,7 @@ cd "$(dirname "$0")"
 systemctl daemon-reload >/dev/null 2>&1 || : 
 rm -f /lib/systemd/system/keepalived.service
 install -v -c -m 0644 keepalived.service /lib/systemd/system/
+[[ -e /etc/keepalived/keepalived.conf ]] || (install -v -m 0644 /etc/keepalived/keepalived.conf.sample /etc/keepalived/keepalived.conf && chown root:root /etc/keepalived/keepalived.conf)
 systemctl daemon-reload >/dev/null 2>&1 || : 
 [[ -d /var/log/keepalived ]] || install -m 0755 -d /var/log/keepalived
 [[ -f /var/log/keepalived/keepalived.log ]] || cat /dev/null > /var/log/keepalived/keepalived.log
