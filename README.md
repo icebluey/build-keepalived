@@ -6,7 +6,7 @@ global_defs {
     vrrp_mcast_group4 224.0.0.18
 }
 vrrp_script check_haproxy {
-    script "/bin/bash -c 'if [[ $(ps -C haproxy --no-header | wc -l) -eq 0 ]] ; then exit 1;fi'"
+    script "/usr/bin/bash -c 'if [[ $(ps -C haproxy --no-header | wc -l) -eq 0 ]] ; then exit 1;fi'"
     interval 3
     weight -30
     fall 2
@@ -47,7 +47,7 @@ global_defs {
     vrrp_mcast_group4 224.0.0.18
 }
 vrrp_script check_haproxy {
-    script "/bin/bash -c 'if [[ $(ps -C haproxy --no-header | wc -l) -eq 0 ]] ; then exit 1;fi'"
+    script "/usr/bin/bash -c 'if [[ $(ps -C haproxy --no-header | wc -l) -eq 0 ]] ; then exit 1;fi'"
     interval 3
     weight -30
     fall 2
