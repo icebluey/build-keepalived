@@ -291,6 +291,7 @@ echo '\''/var/log/keepalived/*log {
         /bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
     endscript
 }'\'' >/etc/logrotate.d/keepalived
+sleep 1
 systemctl restart rsyslog.service >/dev/null 2>&1 || : 
 systemctl restart logrotate.service >/dev/null 2>&1 || : 
 ' > etc/keepalived/.install.txt
