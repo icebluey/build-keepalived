@@ -247,6 +247,10 @@ echo '[Unit]
 Description=LVS and VRRP High Availability Monitor
 After=network-online.target syslog.target
 Wants=network-online.target
+Documentation=man:keepalived(8)
+Documentation=man:keepalived.conf(5)
+Documentation=man:genhash(1)
+Documentation=https://keepalived.org
 
 [Service]
 Type=notify
@@ -267,16 +271,18 @@ cd "$(dirname "$0")"
 systemctl daemon-reload >/dev/null 2>&1 || : 
 rm -f /lib/systemd/system/keepalived.service
 install -v -c -m 0644 keepalived.service /lib/systemd/system/
+[[ -e /etc/keepalived/keepalived.conf ]] || (install -v -m 0644 /etc/keepalived/keepalived.conf.sample /etc/keepalived/keepalived.conf && chown root:root /etc/keepalived/keepalived.conf)
 systemctl daemon-reload >/dev/null 2>&1 || : 
 [[ -d /var/log/keepalived ]] || install -m 0755 -d /var/log/keepalived
 [[ -f /var/log/keepalived/keepalived.log ]] || cat /dev/null > /var/log/keepalived/keepalived.log
+chown syslog:adm /var/log/keepalived/keepalived.log
 echo '\'':programname, startswith, "Keepalived" {
     /var/log/keepalived/keepalived.log
     stop
 }'\'' >/etc/rsyslog.d/10-keepalived.conf
 echo '\''/var/log/keepalived/*log {
     daily
-    rotate 62
+    rotate 30
     dateext
     missingok
     notifempty
@@ -287,7 +293,9 @@ echo '\''/var/log/keepalived/*log {
         /bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
     endscript
 }'\'' >/etc/logrotate.d/keepalived
+sleep 1
 systemctl restart rsyslog.service >/dev/null 2>&1 || : 
+systemctl restart logrotate.service >/dev/null 2>&1 || : 
 ' > etc/keepalived/.install.txt
 chmod 0644 etc/keepalived/.install.txt
 
