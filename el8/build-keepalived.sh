@@ -163,8 +163,8 @@ _build_openssl33() {
     set -e
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
-    _openssl33_ver="$(wget -qO- 'https://www.openssl.org/source/' | grep 'href="openssl-3\.3\.' | sed 's|"|\n|g' | grep -i '^openssl-3\.3\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
-    wget -c -t 9 -T 9 "https://www.openssl.org/source/openssl-${_openssl33_ver}.tar.gz"
+    _openssl33_ver="$(wget -qO- 'https://openssl-library.org/source/index.html' | grep 'openssl-3\.3\.' | sed 's|"|\n|g' | sed 's|/|\n|g' | grep -i '^openssl-3\.3\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
+    wget -c -t 9 -T 9 https://github.com/openssl/openssl/releases/download/openssl-${_openssl33_ver}/openssl-${_openssl33_ver}.tar.gz
     tar -xof openssl-*.tar*
     sleep 1
     rm -f openssl-*.tar*
