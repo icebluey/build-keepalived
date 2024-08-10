@@ -287,8 +287,8 @@ echo '\''/var/log/keepalived/*log {
     compress
     sharedscripts
     postrotate
-        /bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
-        /bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
+        /usr/bin/killall -HUP rsyslogd 2> /dev/null || true
+        /usr/bin/killall -HUP syslogd 2> /dev/null || true
     endscript
 }'\'' >/etc/logrotate.d/keepalived
 sleep 1
