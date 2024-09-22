@@ -19,7 +19,7 @@ apt install -y zlib1g-dev libzstd-dev liblzma-dev libbz2-dev tar gzip bzip2 xz-u
 apt install -y libssl-dev openssl procps iproute2 net-tools iputils-ping vim bind9-dnsutils libxml2-utils
 apt install -y daemon procps psmisc net-tools
 apt install -y lsof strace sysstat tcpdump
-apt install -y make gcc g++ perl libperl-dev groff-base dpkg-dev cmake m4
+apt install -y make gcc g++ perl libperl-dev groff-base dpkg-dev cmake m4 gperf
 apt install -y lsb-release
 # build from src
 apt install -y autoconf autoconf-archive autogen automake autopoint autotools-dev libtool m4 bison flex
