@@ -105,60 +105,6 @@ _build_zlib() {
     /sbin/ldconfig
 }
 
-_build_openssl111() {
-    /sbin/ldconfig
-    set -e
-    _tmp_dir="$(mktemp -d)"
-    cd "${_tmp_dir}"
-    _openssl111_ver="$(wget -qO- 'https://www.openssl.org/source/' | grep 'href="openssl-1.1.1' | sed 's|"|\n|g' | grep -i '^openssl-1.1.1.*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
-    wget -c -t 9 -T 9 "https://www.openssl.org/source/openssl-${_openssl111_ver}.tar.gz"
-    tar -xof openssl-*.tar*
-    sleep 1
-    rm -f openssl-*.tar*
-    cd openssl-*
-    # Only for debian/ubuntu
-    #sed '/define X509_CERT_FILE .*OPENSSLDIR "/s|"/cert.pem"|"/certs/ca-certificates.crt"|g' -i include/internal/cryptlib.h
-    sed '/install_docs:/s| install_html_docs||g' -i Configurations/unix-Makefile.tmpl
-    LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,\$$ORIGIN' ; export LDFLAGS
-    HASHBANGPERL=/usr/bin/perl
-    ./Configure \
-    --prefix=/usr \
-    --libdir=/usr/lib64 \
-    --openssldir=/etc/pki/tls \
-    enable-ec_nistp_64_gcc_128 \
-    zlib enable-tls1_3 threads \
-    enable-camellia enable-seed \
-    enable-rfc3779 enable-sctp enable-cms \
-    enable-md2 enable-rc5 \
-    no-mdc2 no-ec2m \
-    no-sm2 no-sm3 no-sm4 \
-    shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
-    perl configdata.pm --dump
-    make -j2 all
-    rm -fr /tmp/openssl111
-    make DESTDIR=/tmp/openssl111 install_sw
-    cd /tmp/openssl111
-    # Only for debian/ubuntu
-    #mkdir -p usr/include/x86_64-linux-gnu/openssl
-    #chmod 0755 usr/include/x86_64-linux-gnu/openssl
-    #install -c -m 0644 usr/include/openssl/opensslconf.h usr/include/x86_64-linux-gnu/openssl/
-    sed 's|http://|https://|g' -i usr/lib64/pkgconfig/*.pc
-    _strip_files
-    install -m 0755 -d usr/lib64/keepalived/private
-    cp -af usr/lib64/*.so* usr/lib64/keepalived/private/
-    rm -fr /usr/include/openssl
-    rm -fr /usr/include/x86_64-linux-gnu/openssl
-    rm -fr /usr/local/openssl-1.1.1
-    rm -f /etc/ld.so.conf.d/openssl-1.1.1.conf
-    sleep 2
-    /bin/cp -afr * /
-    sleep 2
-    cd /tmp
-    rm -fr "${_tmp_dir}"
-    rm -fr /tmp/openssl111
-    /sbin/ldconfig
-}
-
 _build_openssl33() {
     set -e
     _tmp_dir="$(mktemp -d)"
@@ -214,7 +160,6 @@ _build_openssl33() {
 
 rm -fr /usr/lib64/keepalived
 #_build_zlib
-#_build_openssl111
 _build_openssl33
 
 _tmp_dir="$(mktemp -d)"
