@@ -34,13 +34,31 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env._dateutc }}
-          files: /home/.tmp.keepalived/keepalived-*
+          files: /home/.tmp.keepalived/*
+
+#      - name: Upload keepalived ub2204
+#        run: |
+#          _repo="$(echo ${{ github.repository }} | awk -F '/' '{print $2}')"
+#          _keepalived_ver="$(sudo ls -1 /home/.tmp.keepalived/keepalived-* | sed -e 's|.*keepalived-||g' -e 's|-.*||g' | tail -n1)"
+#          sudo ls -1 /home/.tmp.keepalived/keepalived-* | sudo xargs --no-run-if-empty -I '{}' sudo bash .upload_gh -f '{}' -u "${{ github.repository_owner }}" -r "${_repo}" -t "v${_keepalived_ver}" -k "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Build keepalived ub2004
+        run: |
+          sudo bash run-build-ub2004.sh
+          sudo systemctl stop docker.socket docker.service containerd.service
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env._dateutc }}
+          files: /home/.tmp.keepalived/*
 
       - name: Delete old release tag env
         run: |
           sed -e "/^_dateutc=/d" -i $GITHUB_ENV
 
-#      - name: Upload keepalived ub2204
+#      - name: Upload keepalived ub2004
 #        run: |
 #          _repo="$(echo ${{ github.repository }} | awk -F '/' '{print $2}')"
 #          _keepalived_ver="$(sudo ls -1 /home/.tmp.keepalived/keepalived-* | sed -e 's|.*keepalived-||g' -e 's|-.*||g' | tail -n1)"
@@ -50,20 +68,11 @@ jobs:
       #  run: |
       #    sudo bash run-build-el8.sh
       #    sudo systemctl stop docker.socket docker.service containerd.service
-      #    sudo rm -fr /var/lib/docker/*
+      #    sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
       #- name: Upload keepalived el8
       #  run: |
       #    _repo="$(echo ${{ github.repository }} | awk -F '/' '{print $2}')"
       #    _keepalived_ver="$(sudo ls -1 /home/.tmp.keepalived/keepalived-* | sed -e 's|.*keepalived-||g' -e 's|-.*||g' | tail -n1)"
       #    sudo ls -1 /home/.tmp.keepalived/keepalived-* | sudo xargs --no-run-if-empty -I '{}' sudo bash .upload_gh -f '{}' -u "${{ github.repository_owner }}" -r "${_repo}" -t "v${_keepalived_ver}" -k "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Build keepalived ub2004
-        run: |
-          sudo bash run-build-ub2004.sh
-          sudo systemctl stop docker.socket docker.service containerd.service
-          sudo rm -fr /var/lib/docker/*
-      - name: Upload keepalived ub2004
-        run: |
-          _repo="$(echo ${{ github.repository }} | awk -F '/' '{print $2}')"
-          _keepalived_ver="$(sudo ls -1 /home/.tmp.keepalived/keepalived-* | sed -e 's|.*keepalived-||g' -e 's|-.*||g' | tail -n1)"
-          sudo ls -1 /home/.tmp.keepalived/keepalived-* | sudo xargs --no-run-if-empty -I '{}' sudo bash .upload_gh -f '{}' -u "${{ github.repository_owner }}" -r "${_repo}" -t "v${_keepalived_ver}" -k "${{ secrets.GITHUB_TOKEN }}"
+
