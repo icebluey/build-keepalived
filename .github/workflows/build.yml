@@ -20,7 +20,7 @@ jobs:
           sudo apt upgrade -y -qqq;
           sudo bash docker/install-docker.sh
 
-      - name: Make host output tmp
+      - name: Make output tmp
         run: |
           /bin/rm -fr /tmp/_output.tmp
           mkdir /tmp/_output.tmp
@@ -47,7 +47,7 @@ jobs:
           sudo systemctl stop docker.socket docker.service containerd.service
           sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
 
-      - name: Release
+      - name: Upload files
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env._dateutc }}
