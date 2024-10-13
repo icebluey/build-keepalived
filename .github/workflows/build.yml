@@ -20,6 +20,11 @@ jobs:
           sudo apt upgrade -y -qqq;
           sudo bash docker/install-docker.sh
 
+      - name: Make host output tmp
+        run: |
+          /bin/rm -fr /tmp/_output.tmp
+          mkdir /tmp/_output.tmp
+
       - name: Build keepalived ub2204
         run: |
           sudo bash run-build-ub2204.sh
@@ -29,12 +34,6 @@ jobs:
       - name: Generate release tag env
         run: |
           echo "_dateutc=$(date -u +%Y-%m-%d-%H%M)" >> $GITHUB_ENV
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env._dateutc }}
-          files: /home/.tmp.keepalived/*
 
 #      - name: Upload keepalived ub2204
 #        run: |
@@ -52,7 +51,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env._dateutc }}
-          files: /home/.tmp.keepalived/*
+          files: /tmp/_output.tmp/*
 
       - name: Delete old release tag env
         run: |
