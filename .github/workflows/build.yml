@@ -20,7 +20,7 @@ jobs:
           sudo apt upgrade -y -qqq;
           sudo bash docker/install-docker.sh
 
-      - name: Make output tmp
+      - name: Create output tmp
         run: |
           /bin/rm -fr /tmp/_output.tmp
           mkdir /tmp/_output.tmp
@@ -34,12 +34,6 @@ jobs:
       - name: Generate release tag env
         run: |
           echo "_dateutc=$(date -u +%Y-%m-%d-%H%M)" >> $GITHUB_ENV
-
-#      - name: Upload keepalived ub2204
-#        run: |
-#          _repo="$(echo ${{ github.repository }} | awk -F '/' '{print $2}')"
-#          _keepalived_ver="$(sudo ls -1 /home/.tmp.keepalived/keepalived-* | sed -e 's|.*keepalived-||g' -e 's|-.*||g' | tail -n1)"
-#          sudo ls -1 /home/.tmp.keepalived/keepalived-* | sudo xargs --no-run-if-empty -I '{}' sudo bash .upload_gh -f '{}' -u "${{ github.repository_owner }}" -r "${_repo}" -t "v${_keepalived_ver}" -k "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Build keepalived ub2004
         run: |
@@ -56,6 +50,18 @@ jobs:
       - name: Delete old release tag env
         run: |
           sed -e "/^_dateutc=/d" -i $GITHUB_ENV
+
+
+
+
+
+
+#      - name: Upload keepalived ub2204
+#        run: |
+#          _repo="$(echo ${{ github.repository }} | awk -F '/' '{print $2}')"
+#          _keepalived_ver="$(sudo ls -1 /home/.tmp.keepalived/keepalived-* | sed -e 's|.*keepalived-||g' -e 's|-.*||g' | tail -n1)"
+#          sudo ls -1 /home/.tmp.keepalived/keepalived-* | sudo xargs --no-run-if-empty -I '{}' sudo bash .upload_gh -f '{}' -u "${{ github.repository_owner }}" -r "${_repo}" -t "v${_keepalived_ver}" -k "${{ secrets.GITHUB_TOKEN }}"
+
 
 #      - name: Upload keepalived ub2004
 #        run: |
