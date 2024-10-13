@@ -19,8 +19,7 @@ docker exec ub2004 /bin/bash -c '/bin/rm -fr /tmp/*'
 docker cp ub2004 ub2004:/home/
 docker exec ub2004 /bin/bash /home/ub2004/build-keepalived.sh
 _keepalived_ver="$(docker exec ub2004 ls -1 /tmp/ | grep -i '^keepalived.*xz$' | sed -e 's|keepalived-||g' -e 's|-[0-1]_.*||g')"
-rm -fr /home/.tmp.keepalived
-mkdir /home/.tmp.keepalived
-docker cp ub2004:/tmp/keepalived-"${_keepalived_ver}"-1_ub2004_amd64.tar.xz /home/.tmp.keepalived/
-docker cp ub2004:/tmp/keepalived-"${_keepalived_ver}"-1_ub2004_amd64.tar.xz.sha256 /home/.tmp.keepalived/
+mkdir -p /tmp/_output.tmp
+docker cp ub2004:/tmp/keepalived-"${_keepalived_ver}"-1_ub2004_amd64.tar.xz /tmp/_output.tmp/
+docker cp ub2004:/tmp/keepalived-"${_keepalived_ver}"-1_ub2004_amd64.tar.xz.sha256 /tmp/_output.tmp/
 exit
