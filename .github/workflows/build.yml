@@ -13,8 +13,8 @@ jobs:
       - name: Install docker
         run: >
           sudo apt update -y -qqq;
-          sudo apt autoremove --purge needrestart;
-          sudo apt install -y -qqq bash wget ca-certificates;
+          sudo apt autoremove --purge -y needrestart || true;
+          sudo apt install -y bash wget;
           sudo ln -svf bash /bin/sh;
           sudo bash docker/clean-os.sh;
           sudo bash docker/install-docker.sh
