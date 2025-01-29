@@ -25,21 +25,33 @@ jobs:
           /bin/rm -fr /tmp/_output.tmp
           mkdir /tmp/_output.tmp
 
+      - name: Build keepalived al9
+        run: |
+          sudo bash run-build-al9.sh
+          sudo systemctl stop docker.socket docker.service containerd.service
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+
+      - name: Build keepalived al8
+        run: |
+          sudo bash run-build-al8.sh
+          sudo systemctl stop docker.socket docker.service containerd.service
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+
       - name: Build keepalived ub2204
         run: |
           sudo bash run-build-ub2204.sh
           sudo systemctl stop docker.socket docker.service containerd.service
           sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
 
-      - name: Generate release tag env
-        run: |
-          echo "_dateutc=$(date -u +%Y-%m-%d-%H%M)" >> $GITHUB_ENV
-
       - name: Build keepalived ub2004
         run: |
           sudo bash run-build-ub2004.sh
           sudo systemctl stop docker.socket docker.service containerd.service
           sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+
+      - name: Generate release tag env
+        run: |
+          echo "_dateutc=$(date -u +%Y-%m-%d-%H%M)" >> $GITHUB_ENV
 
       - name: Upload files
         uses: softprops/action-gh-release@v2
@@ -51,8 +63,3 @@ jobs:
         run: |
           sed -e "/^_dateutc=/d" -i $GITHUB_ENV
 
-      #- name: Build keepalived el8
-      #  run: |
-      #    sudo bash run-build-el8.sh
-      #    sudo systemctl stop docker.socket docker.service containerd.service
-      #    sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*

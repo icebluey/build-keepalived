@@ -274,8 +274,8 @@ mv -f etc/keepalived/samples usr/share/doc/keepalived/
 _strip_files
 install -m 0755 -d usr/lib64/keepalived
 cp -afr /"${_private_dir}" usr/lib64/keepalived/
-#patchelf --add-rpath '$ORIGIN/../lib64/keepalived/private' usr/sbin/keepalived
-patchelf --set-rpath '$ORIGIN/../lib64/keepalived/private' usr/sbin/keepalived
+patchelf --add-rpath '$ORIGIN/../lib64/keepalived/private' usr/sbin/keepalived
+#patchelf --set-rpath '$ORIGIN/../lib64/keepalived/private' usr/sbin/keepalived
 
 echo '[Unit]
 Description=LVS and VRRP High Availability Monitor
@@ -328,17 +328,17 @@ systemctl restart logrotate.service >/dev/null 2>&1 || :
 chmod 0644 etc/keepalived/.install.txt
 echo
 sleep 2
-tar -Jcvf /tmp/"keepalived-${_keepalived_ver}-1.el8.x86_64.tar.xz" *
+tar -Jcvf /tmp/"keepalived-${_keepalived_ver}-1_el9_amd64.tar.xz" *
 echo
 sleep 2
 cd /tmp
-sha256sum "keepalived-${_keepalived_ver}-1.el8.x86_64.tar.xz" > "keepalived-${_keepalived_ver}-1.el8.x86_64.tar.xz".sha256
+sha256sum "keepalived-${_keepalived_ver}-1_el9_amd64.tar.xz" > "keepalived-${_keepalived_ver}-1_el9_amd64.tar.xz".sha256
 cd /tmp
 rm -fr /tmp/keepalived
 rm -fr "${_tmp_dir}"
 sleep 2
 echo
-echo ' build keepalived el8 done'
+echo ' build keepalived el9 done'
 echo
 /sbin/ldconfig
 exit
