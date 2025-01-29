@@ -4,24 +4,6 @@ TZ='UTC'; export TZ
 
 umask 022
 
-_install_kernel_dev() {
-    _tmp_dir="$(mktemp -d)"
-    cd "${_tmp_dir}"
-    _kver="6.1.37-20230704"
-    wget -c -t 9 -T 9 "https://github.com/icebluey/kernel.el8/releases/download/v${_kver}/kernel-headers-${_kver}.el8.x86_64.rpm"
-    wget -c -t 9 -T 9 "https://github.com/icebluey/kernel.el8/releases/download/v${_kver}/kernel-devel-${_kver}.el8.x86_64.rpm"
-    yum localinstall -y kernel-headers-*.rpm
-    yum localinstall -y kernel-devel-*.rpm
-    sleep 2
-    cd /tmp
-    rm -fr "${_tmp_dir}"
-}
-_install_kernel_dev
-
-CFLAGS='-O2 -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection'
-export CFLAGS
-CXXFLAGS='-O2 -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection'
-export CXXFLAGS
 LDFLAGS='-Wl,-z,relro -Wl,--as-needed -Wl,-z,now'
 export LDFLAGS
 _ORIG_LDFLAGS="${LDFLAGS}"
@@ -31,6 +13,8 @@ export CC
 CXX=g++
 export CXX
 /sbin/ldconfig
+
+_private_dir='usr/lib64/keepalived/private'
 
 set -e
 
@@ -86,14 +70,14 @@ _build_zlib() {
     sleep 1
     rm -f zlib-*.tar*
     cd zlib-*
-    ./configure --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --sysconfdir=/etc --64
-    make -j2 all
+    ./configure --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --64
+    make -j$(nproc --all) all
     rm -fr /tmp/zlib
     make DESTDIR=/tmp/zlib install
     cd /tmp/zlib
     _strip_files
-    install -m 0755 -d usr/lib64/keepalived/private
-    cp -af usr/lib64/*.so* usr/lib64/keepalived/private/
+    install -m 0755 -d "${_private_dir}"
+    cp -af usr/lib64/*.so* "${_private_dir}"/
     /bin/rm -f /usr/lib64/libz.so*
     /bin/rm -f /usr/lib64/libz.a
     sleep 2
@@ -102,6 +86,101 @@ _build_zlib() {
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/zlib
+    /sbin/ldconfig
+}
+
+_build_brotli() {
+    /sbin/ldconfig
+    set -e
+    _tmp_dir="$(mktemp -d)"
+    cd "${_tmp_dir}"
+    git clone --recursive 'https://github.com/google/brotli.git' brotli
+    cd brotli
+    rm -fr .git
+    if [[ -f bootstrap ]]; then
+        ./bootstrap
+        rm -fr autom4te.cache
+        LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,\$$ORIGIN'; export LDFLAGS
+        ./configure \
+        --build=x86_64-linux-gnu --host=x86_64-linux-gnu \
+        --enable-shared --disable-static \
+        --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --sysconfdir=/etc
+        make -j$(nproc --all) all
+        rm -fr /tmp/brotli
+        make install DESTDIR=/tmp/brotli
+    else
+        LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,\$ORIGIN'; export LDFLAGS
+        cmake \
+        -S "." \
+        -B "build" \
+        -DCMAKE_BUILD_TYPE='Release' \
+        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+        -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+        -DINCLUDE_INSTALL_DIR:PATH=/usr/include \
+        -DLIB_INSTALL_DIR:PATH=/usr/lib64 \
+        -DSYSCONF_INSTALL_DIR:PATH=/etc \
+        -DSHARE_INSTALL_PREFIX:PATH=/usr/share \
+        -DLIB_SUFFIX=64 \
+        -DBUILD_SHARED_LIBS:BOOL=ON \
+        -DCMAKE_INSTALL_SO_NO_EXE:INTERNAL=0
+        cmake --build "build" --parallel $(nproc --all) --verbose
+        rm -fr /tmp/brotli
+        DESTDIR="/tmp/brotli" cmake --install "build"
+    fi
+    cd /tmp/brotli
+    _strip_files
+    install -m 0755 -d "${_private_dir}"
+    cp -af usr/lib64/*.so* "${_private_dir}"/
+    sleep 2
+    /bin/cp -afr * /
+    sleep 2
+    cd /tmp
+    rm -fr "${_tmp_dir}"
+    rm -fr /tmp/brotli
+    /sbin/ldconfig
+}
+
+_build_zstd() {
+    /sbin/ldconfig
+    set -e
+    _tmp_dir="$(mktemp -d)"
+    cd "${_tmp_dir}"
+    git clone --recursive "https://github.com/facebook/zstd.git"
+    cd zstd
+    rm -fr .git
+    sed '/^PREFIX/s|= .*|= /usr|g' -i Makefile
+    sed '/^LIBDIR/s|= .*|= /usr/lib64|g' -i Makefile
+    sed '/^prefix/s|= .*|= /usr|g' -i Makefile
+    sed '/^libdir/s|= .*|= /usr/lib64|g' -i Makefile
+    sed '/^PREFIX/s|= .*|= /usr|g' -i lib/Makefile
+    sed '/^LIBDIR/s|= .*|= /usr/lib64|g' -i lib/Makefile
+    sed '/^prefix/s|= .*|= /usr|g' -i lib/Makefile
+    sed '/^libdir/s|= .*|= /usr/lib64|g' -i lib/Makefile
+    sed '/^PREFIX/s|= .*|= /usr|g' -i programs/Makefile
+    #sed '/^LIBDIR/s|= .*|= /usr/lib64|g' -i programs/Makefile
+    sed '/^prefix/s|= .*|= /usr|g' -i programs/Makefile
+    #sed '/^libdir/s|= .*|= /usr/lib64|g' -i programs/Makefile
+    LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,\$$OOORIGIN'; export LDFLAGS
+    #make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64
+    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C lib lib-mt
+    LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
+    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C programs
+    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C contrib/pzstd
+    rm -fr /tmp/zstd
+    make install DESTDIR=/tmp/zstd
+    install -v -c -m 0755 contrib/pzstd/pzstd /tmp/zstd/usr/bin/
+    cd /tmp/zstd
+    ln -svf zstd.1 usr/share/man/man1/pzstd.1
+    _strip_files
+    find usr/lib64/ -type f -iname '*.so*' | xargs -I '{}' chrpath -r '$ORIGIN' '{}'
+    install -m 0755 -d "${_private_dir}"
+    cp -af usr/lib64/*.so* "${_private_dir}"/
+    sleep 2
+    /bin/cp -afr * /
+    sleep 2
+    cd /tmp
+    rm -fr "${_tmp_dir}"
+    rm -fr /tmp/zstd
     /sbin/ldconfig
 }
 
@@ -115,40 +194,35 @@ _build_openssl33() {
     sleep 1
     rm -f openssl-*.tar*
     cd openssl-*
-    # Only for debian/ubuntu
-    #sed '/define X509_CERT_FILE .*OPENSSLDIR "/s|"/cert.pem"|"/certs/ca-certificates.crt"|g' -i include/internal/cryptlib.h
     sed '/install_docs:/s| install_html_docs||g' -i Configurations/unix-Makefile.tmpl
-    LDFLAGS='' ; LDFLAGS='-Wl,-z,relro -Wl,--as-needed -Wl,-z,now -Wl,-rpath,\$$ORIGIN' ; export LDFLAGS
+    LDFLAGS=''; LDFLAGS='-Wl,-z,relro -Wl,--as-needed -Wl,-z,now -Wl,-rpath,\$$ORIGIN'; export LDFLAGS
     HASHBANGPERL=/usr/bin/perl
     ./Configure \
     --prefix=/usr \
     --libdir=/usr/lib64 \
     --openssldir=/etc/pki/tls \
-    enable-ec_nistp_64_gcc_128 \
-    zlib enable-tls1_3 threads \
+    enable-zlib enable-zstd enable-brotli \
+    enable-argon2 enable-tls1_3 threads \
     enable-camellia enable-seed \
     enable-rfc3779 enable-sctp enable-cms \
-    enable-md2 enable-rc5 enable-ktls \
+    enable-ec enable-ecdh enable-ecdsa \
+    enable-ec_nistp_64_gcc_128 \
+    enable-poly1305 enable-ktls enable-quic \
+    enable-md2 enable-rc5 \
     no-mdc2 no-ec2m \
-    no-sm2 no-sm3 no-sm4 \
+    no-sm2 no-sm2-precomp no-sm3 no-sm4 \
     shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
     perl configdata.pm --dump
-    make -j2 all
+    make -j$(nproc --all) all
     rm -fr /tmp/openssl33
     make DESTDIR=/tmp/openssl33 install_sw
     cd /tmp/openssl33
-    # Only for debian/ubuntu
-    #mkdir -p usr/include/x86_64-linux-gnu/openssl
-    #chmod 0755 usr/include/x86_64-linux-gnu/openssl
-    #install -c -m 0644 usr/include/openssl/opensslconf.h usr/include/x86_64-linux-gnu/openssl/
     sed 's|http://|https://|g' -i usr/lib64/pkgconfig/*.pc
     _strip_files
-    install -m 0755 -d usr/lib64/keepalived/private
-    cp -af usr/lib64/*.so* usr/lib64/keepalived/private/
+    install -m 0755 -d "${_private_dir}"
+    cp -af usr/lib64/*.so* "${_private_dir}"/
     rm -fr /usr/include/openssl
     rm -fr /usr/include/x86_64-linux-gnu/openssl
-    rm -fr /usr/local/openssl-1.1.1
-    rm -f /etc/ld.so.conf.d/openssl-1.1.1.conf
     sleep 2
     /bin/cp -afr * /
     sleep 2
@@ -159,7 +233,9 @@ _build_openssl33() {
 }
 
 rm -fr /usr/lib64/keepalived
-#_build_zlib
+_build_zlib
+_build_brotli
+_build_zstd
 _build_openssl33
 
 _tmp_dir="$(mktemp -d)"
@@ -171,7 +247,8 @@ tar -xof keepalived-*.tar*
 sleep 1
 rm -f keepalived-*.tar*
 cd keepalived-*
-LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib64/keepalived/private' ; export LDFLAGS
+#LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib64/keepalived/private' ; export LDFLAGS
+LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
 ./configure \
 --build=x86_64-linux-gnu \
 --host=x86_64-linux-gnu \
@@ -182,7 +259,7 @@ LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,/usr/lib64/keepalived/privat
 --enable-nftables \
 --disable-iptables \
 --with-init=systemd
-make -j2 all
+make -j$(nproc --all) all
 rm -fr /tmp/keepalived
 sleep 2
 make DESTDIR=/tmp/keepalived install
@@ -194,22 +271,11 @@ install -m 0755 -d var/log/keepalived
 install -m 0755 -d usr/libexec/keepalived
 [[ -f etc/keepalived/keepalived.conf ]] && mv -f etc/keepalived/keepalived.conf etc/keepalived/keepalived.conf.default
 mv -f etc/keepalived/samples usr/share/doc/keepalived/
-#install -m 0755 -d usr/lib64/keepalived
-#cp -af /usr/lib64/keepalived/private usr/lib64/keepalived/
-install -m 0755 -d usr/lib64/keepalived/private
-cp -af \
-/usr/local/private/libz.so* \
-/usr/local/private/libssl.so* \
-/usr/local/private/libcrypto.so* \
-usr/lib64/keepalived/private/
-strip usr/sbin/keepalived
-find -L usr/share/man/ -type l -exec rm -f '{}' \;
-sleep 2
-find usr/share/man/ -type f -iname '*.[1-9]' -exec gzip -f -9 '{}' \;
-sleep 2
-find -L usr/share/man/ -type l | while read file; do ln -svf "$(readlink -s "${file}").gz" "${file}.gz" ; done
-sleep 2
-find -L usr/share/man/ -type l -exec rm -f '{}' \;
+_strip_files
+install -m 0755 -d usr/lib64/keepalived
+cp -afr /"${_private_dir}" usr/lib64/keepalived/
+#patchelf --add-rpath '$ORIGIN/../lib64/keepalived/private' usr/sbin/keepalived
+patchelf --set-rpath '$ORIGIN/../lib64/keepalived/private' usr/sbin/keepalived
 
 echo '[Unit]
 Description=LVS and VRRP High Availability Monitor
