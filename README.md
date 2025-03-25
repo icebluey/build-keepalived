@@ -1,3 +1,11 @@
+
+### run
+```
+# el8 / el9
+dnf install -y libnl3 libnftnl libmnl net-snmp-libs net-snmp-agent-libs file-libs systemd-libs
+
+```
+
 ## Master
 #### /etc/keepalived/keepalived.conf
 ```
