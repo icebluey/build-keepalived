@@ -307,7 +307,8 @@ LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
 --enable-snmp-rfc \
 --enable-nftables \
 --disable-iptables \
---with-init=systemd
+--with-init=systemd \
+--with-iproute-etc-dir=/etc/iproute2
 make -j$(nproc --all) all
 rm -fr /tmp/keepalived
 sleep 2
