@@ -5,7 +5,14 @@ umask 022
 set -e
 systemctl start docker
 sleep 5
-docker run --cpus="2.0" --rm --name ub2004 -itd ubuntu:20.04 bash
+echo
+cat /proc/cpuinfo
+echo
+if [ "$(cat /proc/cpuinfo | grep -i '^processor' | wc -l)" -gt 1 ]; then
+    docker run --cpus="$(cat /proc/cpuinfo | grep -i '^processor' | wc -l).0" --rm --name ub2004 -itd ubuntu:20.04 bash
+else
+    docker run --rm --name ub2004 -itd ubuntu:20.04 bash
+fi
 sleep 2
 docker exec ub2004 apt update -y
 docker exec ub2004 apt upgrade -fy
