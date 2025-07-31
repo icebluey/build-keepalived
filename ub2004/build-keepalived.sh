@@ -402,8 +402,8 @@ chmod 0644 etc/keepalived/.install.txt
 
 # ubuntu 20.04 patchelf 0.10
 patchelf --set-rpath '$ORIGIN/../lib/x86_64-linux-gnu/keepalived/private' usr/sbin/keepalived
-rm -vfr lib
-rm -vfr var
+rm -fr lib
+rm -fr var
 echo
 sleep 2
 tar -Jcvf /tmp/"keepalived-${_keepalived_ver}-1_ub2004_amd64.tar.xz" *
