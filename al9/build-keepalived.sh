@@ -317,7 +317,7 @@ cd /tmp/keepalived
 rm -fr usr/lib
 rm -fr lib
 rm -fr lib64
-install -m 0755 -d var/log/keepalived
+rm -fr var
 install -m 0755 -d usr/libexec/keepalived
 [[ -f etc/keepalived/keepalived.conf ]] && mv -f etc/keepalived/keepalived.conf etc/keepalived/keepalived.conf.default
 mv -f etc/keepalived/samples usr/share/doc/keepalived/
