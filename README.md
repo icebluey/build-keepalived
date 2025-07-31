@@ -2,7 +2,8 @@
 ### run
 ```
 # el8 / el9
-dnf install -y libnl3 libnftnl libmnl net-snmp-libs net-snmp-agent-libs file-libs systemd-libs iproute ipvsadm
+dnf install -y libnl3 libnftnl libmnl net-snmp-agent-libs net-snmp-libs file-libs systemd-libs
+dnf install -y iproute ipvsadm
 
 ```
 
