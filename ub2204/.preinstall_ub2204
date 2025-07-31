@@ -42,6 +42,8 @@ apt install -y libnftables-dev nftables
 apt install -y libipset-dev ipset
 apt install -y iptables
 apt install -y libsnmp-dev libmnl-dev libnftnl-dev libnl-3-dev libnl-genl-3-dev libnfnetlink-dev
+apt install -y libnl-3-dev libnl-genl-3-dev libsnmp-dev libnl-nf-3-dev libnfnetlink-dev libnftnl-dev libipset-dev libip4tc-dev libip6tc-dev libiptc-dev libxtables-dev
+apt reinstall -y libnl-3-dev libnl-genl-3-dev libsnmp-dev libnl-nf-3-dev libnfnetlink-dev libnftnl-dev libipset-dev libip4tc-dev libip6tc-dev libiptc-dev libxtables-dev
 
 # build nettle for gnutls
 apt install -y libgmp-dev
