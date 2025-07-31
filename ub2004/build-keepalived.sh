@@ -73,7 +73,7 @@ _build_zlib() {
     rm -f zlib-*.tar*
     cd zlib-*
     ./configure --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu --includedir=/usr/include --sysconfdir=/etc --64
-    make -j2 all
+    make -j$(nproc --all) all
     rm -fr /tmp/zlib
     make DESTDIR=/tmp/zlib install
     cd /tmp/zlib
@@ -107,7 +107,7 @@ _build_brotli() {
         --build=x86_64-linux-gnu --host=x86_64-linux-gnu \
         --enable-shared --disable-static \
         --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu --includedir=/usr/include --sysconfdir=/etc
-        make -j2 all
+        make -j$(nproc --all) all
         rm -fr /tmp/brotli
         make install DESTDIR=/tmp/brotli
     else
@@ -125,7 +125,7 @@ _build_brotli() {
         -DLIB_SUFFIX=64 \
         -DBUILD_SHARED_LIBS:BOOL=ON \
         -DCMAKE_INSTALL_SO_NO_EXE:INTERNAL=0
-        cmake --build "build"  --verbose
+        cmake --build "build" --parallel $(nproc --all) --verbose
         rm -fr /tmp/brotli
         DESTDIR="/tmp/brotli" cmake --install "build"
     fi
@@ -163,7 +163,7 @@ _build_zstd() {
     sed '/^prefix/s|= .*|= /usr|g' -i programs/Makefile
     #sed '/^libdir/s|= .*|= /usr/lib/x86_64-linux-gnu|g' -i programs/Makefile
     LDFLAGS='' ; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,-rpath,\$$OOORIGIN' ; export LDFLAGS
-    make -j2 V=1 prefix=/usr libdir=/usr/lib/x86_64-linux-gnu
+    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib/x86_64-linux-gnu
     rm -fr /tmp/zstd
     make install DESTDIR=/tmp/zstd
     cd /tmp/zstd
@@ -211,7 +211,7 @@ _build_openssl33() {
     no-sm2 no-sm2-precomp no-sm3 no-sm4 \
     shared linux-x86_64 '-DDEVRANDOM="\"/dev/urandom\""'
     perl configdata.pm --dump
-    make -j2 all
+    make -j$(nproc --all) all
     rm -fr /tmp/openssl33
     make DESTDIR=/tmp/openssl33 install_sw
     cd /tmp/openssl33
@@ -318,10 +318,10 @@ LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
 --sysconfdir=/etc \
 --enable-snmp \
 --enable-snmp-rfc \
---enable-nftables \
---disable-iptables \
+--enable-iptables \
+--disable-nftables \
 --with-init=systemd
-make -j2 all
+make -j$(nproc --all) all
 rm -fr /tmp/keepalived
 sleep 2
 make DESTDIR=/tmp/keepalived install
