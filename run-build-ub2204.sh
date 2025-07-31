@@ -5,7 +5,14 @@ umask 022
 set -e
 systemctl start docker
 sleep 5
-docker run --cpus="2.0" --rm --name ub2204 -itd ubuntu:22.04 bash
+echo
+cat /proc/cpuinfo
+echo
+if [ "$(cat /proc/cpuinfo | grep -i '^processor' | wc -l)" -gt 1 ]; then
+    docker run --cpus="$(cat /proc/cpuinfo | grep -i '^processor' | wc -l).0" --rm --name ub2204 -itd ubuntu:22.04 bash
+else
+    docker run --rm --name ub2204 -itd ubuntu:22.04 bash
+fi
 sleep 2
 docker exec ub2204 apt update -y
 docker exec ub2204 apt upgrade -fy
