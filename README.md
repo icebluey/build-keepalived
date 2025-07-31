@@ -6,6 +6,10 @@ dnf install -y libnl3 libnftnl libmnl net-snmp-agent-libs net-snmp-libs file-lib
 dnf install -y ipvsadm iproute nftables
 #dnf install -y iptables iptables-libs iptables-ebtables ipset ipset-libs
 
+# ubuntu 20.04 / 22.04
+apt install -y libnl-3-200 libnl-genl-3-200 libnftnl11 libmnl0 libsnmp35 libsystemd0 libip4tc2 libip6tc2
+apt install -y ipvsadm iproute2 iptables ipset ebtables
+
 ```
 
 ## Master
