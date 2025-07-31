@@ -15,6 +15,8 @@ export CXX
 /sbin/ldconfig
 
 apt install -y patchelf
+apt install -y libnl-3-dev libnl-genl-3-dev libsnmp-dev libnl-nf-3-dev libnfnetlink-dev libnftnl-dev libipset-dev libip4tc-dev
+apt reinstall -y libnl-3-dev libnl-genl-3-dev libsnmp-dev libnl-nf-3-dev libnfnetlink-dev libnftnl-dev libipset-dev libip4tc-dev
 
 _private_dir='usr/lib/x86_64-linux-gnu/keepalived/private'
 
